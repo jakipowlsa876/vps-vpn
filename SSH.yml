@@ -1,0 +1,47 @@
+name: Keep Servers serv00
+on:
+  schedule:
+   - cron: '0 15 */8 * *'
+  workflow_dispatch: 
+
+jobs:
+  keep_servers_alive:
+    runs-on: ubuntu-latest
+    env:
+      ACCOUNTS: >
+        [
+        {"SSH_USER":"123456789", "SSH_PASS":"123456", "HOST":"sxxx.serv00.com"}
+        ]
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Install required packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y sshpass jq
+
+      - name: Process each account
+        run: |
+           echo "*****************************************************"
+           echo "*****************************************************"
+           echo "个人节点一键部署 ：github.com/jakipowlsa876/vps-vpn"
+           echo "vps服务器远程登录一次SSH脚本【Github】"
+           echo "*****************************************************"
+           echo "*****************************************************"
+            count=0  
+           for account in $(echo "${ACCOUNTS}" | jq -c '.[]'); do
+              count=$((count+1))
+              SSH_USER=$(echo $account | jq -r '.SSH_USER')
+              SSH_PASS=$(echo $account | jq -r '.SSH_PASS')
+              HOST=$(echo $account | jq -r '.HOST')
+           if sshpass -p "$SSH_PASS" ssh -o StrictHostKeyChecking=no "$SSH_USER@$HOST" -q exit; then
+            echo "🎉恭喜！✅第【$count】台服务器连接成功！🚀服务器地址：$HOST ，账户名：$SSH_USER" 
+           else
+            echo "===================================================="
+            echo "💥杯具！❌第【$count】台服务器连接失败！🚀服务器地址：$HOST ，账户名：$SSH_USER"
+            echo "⚠️可能账号名、密码、服务器名称输入错误，或者当前服务器在维护中"  
+            echo "===================================================="
+           fi
+           sleep 10
+            done

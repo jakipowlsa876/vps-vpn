@@ -1,0 +1,7 @@
+[Unit]
+Description=SB traffic guard (per-cycle egress cap + subscription info refresh)
+After=network.target vnstat.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/sb-traffic-guard.sh

@@ -1,0 +1,38 @@
+name: Parallel URL Fetch
+
+on:
+ # schedule:
+#  - cron: '*/10 * * * *' # 每10分钟执行一次（公开库每月2000分钟运行时长，每天64分钟）
+  workflow_dispatch: 
+
+jobs:
+  fetch-urls:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Fetch URLs in parallel
+      # secrets设置，变量名称：http
+      # 变量值要求：每个保活/up网页或每个重启/re网页之间用空格或者，或者,间隔开，网页前带http://
+      # 变量值填写示例：http://保活或重启网页1 http://保活或重启网页2 http://保活或重启网页3 ………
+      run: |
+        IFS=$',， ' read -r -a http <<< "${{ secrets.http }}"
+         echo "*****************************************************"
+         echo "个人节点一键部署 ：github.com/jakipowlsa876/vps-vpn"
+         echo "🎉Github定时运行serv00保活网页🎉"
+         echo "请先确认已成功安装serv00的SSH脚本或者Github/VPS/软路由脚本"
+         echo "脚本地址：https://github.com/jakipowlsa876/vps-vpn"
+         echo "*****************************************************"
+        for url in "${http[@]}"; do
+          response=$(curl -sk "$url" || true)
+          if [[ "$response" == *"网页保活启动"* ]]; then
+          echo "🎉恭喜！$url ✅运行正常，成功拉起一次保活"
+          elif [[ "$response" == *"主程序重启成功"* ]]; then
+          echo "🎉恭喜！$url ✅运行正常，成功重启一次主程序"
+          else
+         echo "💥杯具！$url ❌运行失败，⚠️网页变量是否填写正确？或者Serv00炸了"
+         fi
+        done
+        wait

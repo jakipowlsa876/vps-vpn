@@ -1,0 +1,11 @@
+[Unit]
+Description=Run SB traffic guard every minute
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+AccuracySec=10s
+Unit=sb-guard.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=SB subscription file server (token path)
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/local/bin/sb-sub-server.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
