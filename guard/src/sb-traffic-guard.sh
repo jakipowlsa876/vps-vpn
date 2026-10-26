@@ -46,7 +46,7 @@ CS_NUM=$(date -d "$CYCLE_START" +%Y%m%d)
 
 BOTH=0; [ "$COUNT_MODE" = "both" ] && BOTH=1
 USED=$(vnstat -i "$IFACE" --json d 2>/dev/null | jq -r --argjson cs "$CS_NUM" --argjson both "$BOTH" '
-  [.interfaces[0].traffic.days[]?
+  [.interfaces[0].traffic.day[]?
    | select((.date.year*10000 + .date.month*100 + .date.day) >= $cs)
    | (.tx + (if $both == 1 then .rx else 0 end))] | add // 0' 2>/dev/null)
 case "$USED" in ''|*[!0-9]*) USED=0;; esac
